@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Pulse | Intel Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="scanline"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="glass-container">
+        <div class="terminal-header">
+            <span class="live-indicator">● SYSTEM ACTIVE</span>
+            <div id="systemLog" class="system-log">_BOOT_COMPLETE...</div>
+        </div>
+        
+        <header>
+            <h1>SENTIMENT<span>PULSE</span></h1>
+            <p id="viewTitle">CORE INTELLIGENCE FEED</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" id="topicInput" placeholder="ENTER TARGET...">
+                <button onclick="getSentiment()"><i class="fas fa-magnifying-glass"></i></button>
+            </div>
+            <div id="historyList" class="history-list"></div>
+        </div>
+
+        <div id="intelHub" class="hidden">
+            <div class="dashboard-grid">
+                <div class="chart-wrapper"><canvas id="sentimentChart"></canvas></div>
+                <div class="stats-panel">
+                    <div class="summary-box" id="summaryBox">WAITING...</div>
+                    <div class="keyword-intel">
+                        <label>DETECTED KEYWORDS:</label>
+                        <div id="keywordList" class="keyword-tags"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden">
+            <div class="pulse"></div>
+            <div class="glitch-text">INTERCEPTING DATA...</div>
+        </div>
+
+        <div class="tuning-bar hidden" id="filterBar">
+            <div class="tuning-label">SIGNAL TUNING:</div>
+            <select id="sentimentFilter" onchange="applyFilters()">
+                <option value="all">MOOD: ALL</option>
+                <option value="Positive">MOOD: POSITIVE</option>
+                <option value="Negative">MOOD: NEGATIVE</option>
+            </select>
+            <select id="langFilter" onchange="getSentiment()">
+                <option value="en">LANG: ENGLISH</option>
+                <option value="hi">LANG: HINDI</option>
+                <option value="gu">LANG: GUJARATI</option>
+                <option value="fr">LANG: FRENCH</option>
+            </select>
+        </div>
+
+        <div id="feed" class="grid-feed"></div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
