@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Pulse | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="user-bar">
+        <span>Welcome, <strong>{{ user.name }}</strong> | Feed localized to {{ user.city }}</span>
+        <a href="/logout" style="color: #ef4444; font-size: 0.8rem;">[ Terminate Session ]</a>
+    </div>
+    <div class="glass-container">
+        <header>
+            <h1>SENTIMENT<span>PULSE</span></h1>
+            <p id="viewTitle">REAL-TIME DATA INTELLIGENCE</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" id="topicInput" placeholder="Topic (e.g. Technology, Stocks)...">
+                <input type="text" id="cityInput" placeholder="Location (Optional)...">
+                <button id="searchBtn" onclick="getSentiment()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>FETCHING DATA...</p>
+        </div>
+
+        <div id="feed" class="grid-feed">
+            </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

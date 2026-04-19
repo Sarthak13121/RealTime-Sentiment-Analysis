@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In | Sentiment Pulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div class="glass-container" style="max-width: 500px; width: 90%;">
+        <header>
+            <h1>USER<span>ONBOARDING</span></h1>
+            <p>Initialize your intelligence profile</p>
+        </header>
+        
+        <form action="/login" method="POST" class="login-form">
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Gmail ID" required>
+            <input type="text" name="mobile" placeholder="Mobile Number" required>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+                <input type="text" name="country" placeholder="Country" required>
+                <input type="text" name="state" placeholder="State" required>
+            </div>
+            <input type="text" name="city" placeholder="City Name" required style="margin-bottom: 20px;">
+            
+            <button type="submit" style="width: 100%; padding: 15px;">START SESSION</button>
+        </form>
+    </div>
+</body>
+</html>
