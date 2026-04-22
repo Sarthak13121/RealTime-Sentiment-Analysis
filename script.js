@@ -1,97 +1,82 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("App Initialized: Syncing Global Feed...");
-    fetchTopHeadlines();
+    fetchInitialFeed();
 });
 
-// --- FETCH TOP NEWS (Startup) ---
-async function fetchTopHeadlines() {
+// FIXED: Defined the navigation function to "go into" sections
+function scrollToSection(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+async function fetchInitialFeed() {
     toggleLoader(true);
     try {
-        const res = await fetch('/api/top-headlines');
-        const result = await res.json();
+        const res = await fetch('/api/feed');
+        const data = await res.json();
         
-        if (result.status === "success") {
-            renderArticles(result.articles);
+        if (data.status === "success") {
+            // Correctly targets the 3 Tier IDs
+            renderToContainer(data.local, 'localFeed');
+            renderToContainer(data.national, 'nationalFeed');
+            renderToContainer(data.global, 'globalFeed');
         } else {
-            showError("System Offline: " + result.message);
+            console.error("Backend Error:", data.message);
         }
     } catch (err) {
-        showError("Could not connect to Python backend.");
+        console.error("Network Error:", err);
     } finally {
         toggleLoader(false);
     }
 }
 
-// --- SEARCH FUNCTION ---
-async function getSentiment() {
-    const topic = document.getElementById('topicInput').value.trim();
-    const city = document.getElementById('cityInput').value.trim();
-
-    if (!topic && !city) {
-        alert("Please enter a target topic or location.");
-        return;
-    }
-
-    toggleLoader(true);
-    const displayTitle = [topic, city].filter(Boolean).join(" | ");
-    document.getElementById('viewTitle').innerText = `ANALYSIS: ${displayTitle.toUpperCase()}`;
-
-    try {
-        const res = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ topic, city })
-        });
-        
-        const result = await res.json();
-        if (result.status === "success") {
-            renderArticles(result.articles);
-        } else {
-            showError(result.message);
-        }
-    } catch (err) {
-        showError("Communication Error: Re-check server status.");
-    } finally {
-        toggleLoader(false);
-    }
-}
-
-// --- UI RENDERING ---
-function renderArticles(articles) {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = ""; 
-
+function renderToContainer(articles, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    
     if (!articles || articles.length === 0) {
-        feed.innerHTML = `
-            <div class="no-results">
-                <p>NO DATA INTERCEPTED AT THESE COORDINATES.</p>
-                <small>Try a more general topic or check your API key.</small>
-            </div>`;
+        container.innerHTML = "<p class='no-data'>No data available for this sector.</p>";
         return;
     }
 
     articles.forEach(art => {
-        const card = document.createElement('div');
-        card.className = "card";
-        card.innerHTML = `
-            <img src="${art.image || 'https://via.placeholder.com/400x225?text=Pulse+Intel'}" class="card-img" onerror="this.src='https://via.placeholder.com/400x225?text=Pulse+Intel'">
-            <div class="card-content">
-                <span class="mood-badge" style="color: ${art.color}; border: 1px solid ${art.color}44; background: ${art.color}11">
-                    ${art.mood}
-                </span>
-                <p class="source">${art.source}</p>
-                <h3>${art.title}</h3>
-                <p class="desc">${art.description}</p>
-                <a href="${art.url}" target="_blank" class="link">DECRYPT FULL INTEL →</a>
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+            <img src="${art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=500'}" class="card-img">
+            <div class="card-body">
+                <span class="badge" style="background:${art.color}22; color:${art.color}">${art.mood}</span>
+                <p style="font-size:0.7rem; color:#94a3b8; margin:10px 0 5px;">${art.source}</p>
+                <h3 style="font-size:0.95rem; line-height:1.3;">${art.title}</h3>
+                <a href="${art.url}" target="_blank" class="link">DECRYPT INTEL →</a>
             </div>
         `;
-        feed.appendChild(card);
+        container.appendChild(div);
     });
 }
 
-function showError(msg) {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = `<p class="error-msg">SYSTEM ERROR: ${msg.toUpperCase()}</p>`;
+// Fixed Search Logic
+async function getSentiment() {
+    const topic = document.getElementById('topicInput').value;
+    if (!topic) return;
+
+    toggleLoader(true);
+    try {
+        const res = await fetch('/api/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic: topic })
+        });
+        const data = await res.json();
+        
+        // We will temporarily show search results in the Global feed for visibility
+        renderToContainer(data.articles, 'globalFeed');
+        scrollToSection('globalSection');
+    } finally {
+        toggleLoader(false);
+    }
 }
 
 function toggleLoader(show) {

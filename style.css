@@ -1,105 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 :root {
     --bg: #0f172a;
     --card: #1e293b;
     --accent: #38bdf8;
-    --text: #f1f5f9;
+    --text: #f8fafc;
+    --border: #334155;
 }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
+    overflow-x: hidden;
 }
 
-.glass-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-}
-
-header h1 {
-    text-align: center;
-    letter-spacing: 4px;
-    color: var(--accent);
-}
-
-.search-section {
-    margin: 30px 0;
-}
-
-.search-bar {
+/* Auth Pages */
+.auth-page {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+}
+
+.auth-card {
     background: var(--card);
-    padding: 10px;
-    border-radius: 12px;
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
 }
 
-input {
-    flex: 1;
-    background: transparent;
-    border: 1px solid #334155;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
+.branding h1 { color: var(--accent); letter-spacing: 4px; margin: 0; }
+.branding span { color: #fff; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; }
+input, select {
+    width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border);
+    color: #fff; border-radius: 8px; outline: none; box-sizing: border-box;
 }
 
-button {
-    background: var(--accent);
-    border: none;
-    padding: 0 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
+.geo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.btn-primary {
+    width: 100%; padding: 14px; background: var(--accent); border: none;
+    color: #0f172a; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.3s;
 }
 
-.grid-feed {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+/* Dashboard Nav */
+.top-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 40px; background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
 }
+
+.top-nav h1 { font-size: 1.2rem; letter-spacing: 2px; }
+.logout-btn { color: #ef4444; text-decoration: none; font-size: 0.8rem; font-weight: bold; border: 1px solid #ef444433; padding: 5px 12px; border-radius: 6px; }
+
+/* Dashboard Content */
+.container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+
+.search-panel {
+    display: flex; gap: 15px; background: var(--card); padding: 15px;
+    border-radius: 12px; border: 1px solid var(--border); margin-bottom: 40px;
+}
+
+.news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
 
 .card {
-    background: var(--card);
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid #334155;
+    background: var(--card); border-radius: 12px; border: 1px solid var(--border);
+    overflow: hidden; transition: 0.3s; display: flex; flex-direction: column;
 }
 
+.card:hover { transform: translateY(-5px); border-color: var(--accent); }
 .card-img { width: 100%; height: 180px; object-fit: cover; }
-.card-content { padding: 20px; }
-.mood-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-.source { font-size: 0.75rem; color: #94a3b8; margin: 10px 0 5px; }
-.desc { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 15px; }
-.link { color: var(--accent); text-decoration: none; font-weight: bold; font-size: 0.8rem; }
-.login-form input {
-    width: 100%;
-    margin-bottom: 12px;
-    display: block;
-}
+.card-body { padding: 20px; flex-grow: 1; }
 
-.user-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.05);
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-    border: 1px solid #334155;
-}
+.badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; font-weight: 800; }
 
-.error-msg {
-    color: var(--danger);
-    text-align: center;
-    padding: 20px;
-}
+/* Interest Chips */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip input { display: none; }
+.chip span { padding: 10px 20px; border: 1px solid var(--border); border-radius: 30px; cursor: pointer; font-size: 0.9rem; }
+.chip input:checked + span { background: var(--accent); color: #000; border-color: var(--accent); }
 
 .hidden { display: none; }
-.spinner {
-    width: 40px; height: 40px; border: 4px solid #334155; border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto;
-}
+.spinner { width: 30px; height: 30px; border: 3px solid #334155; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Section Labels for Interests Page */
+.section-label {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    border-left: 3px solid var(--accent);
+    padding-left: 10px;
+}
+
+/* Status Indicators in Nav */
+.status-indicators {
+    display: flex;
+    gap: 15px;
+    margin-right: 20px;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.status-dot {
+    color: var(--success); /* Emerald Green dots for active regions */
+    font-weight: 700;
+}
+
+/* Redesigned Logout for Dashboard */
+.logout-btn {
+    color: #fff;
+    background: #ef4444;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 6px 15px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+/* Ensure the right side of the nav is a flex container */
+.nav-right {
+    display: flex;
+    align-items: center; /* Vertically centers everything */
+    gap: 25px;           /* Creates space between the Country List and Logout Button */
+}
+
+/* Fix spacing between individual country dots */
+.status-indicators {
+    display: flex;
+    align-items: center;
+    gap: 15px;           /* Space between 'India' and 'USA' */
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+/* Add a tiny gap between the dot and the country name */
+.status-dot {
+    display: flex;
+    align-items: center;
+    gap: 5px;            /* Space between ● and the text */
+    color: var(--success);
+    font-weight: 700;
+    white-space: nowrap; /* Prevents names from breaking into two lines */
+}
+
+/* Professional Logout Button spacing */
+.logout-btn {
+    color: #fff;
+    background: #ef4444;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 8px 18px;   /* Increased padding for a better look */
+    border-radius: 6px;
+    transition: 0.3s;
+    line-height: 1;      /* Ensures text stays centered in the button */
+    display: inline-block;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+.search-panel button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 30px;
+    
+    /* Curved Rectangle / Pill Shape */
+    border-radius: 30px; 
+    
+    background: var(--accent);
+    color: #0f172a;
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+
+.search-panel button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);
+}
+
+.search-panel button i {
+    font-size: 0.9rem;
+}
+/* Container for the chips */
+.chip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Forces exactly 4 equal columns */
+    gap: 15px;                             /* Space between rows and columns */
+    margin-top: 25px;
+    width: 100%;
+}
+
+/* Individual chip label */
+.chip {
+    cursor: pointer;
+    width: 100%; /* Ensures the label fills its grid square */
+}
+
+/* The actual button/span inside the label */
+.chip span {
+    display: block;
+    padding: 12px 5px; /* Vertical and horizontal padding */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #334155;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: 0.3s ease;
+    
+    /* Prevents text from overlapping or wrapping ugly */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+/* Selected state (when checkbox is checked) */
+.chip input:checked + span {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
+}
+
+/* Hover effect */
+.chip:hover span {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive fix: If the screen is too small, switch to 2 per row */
+@media (max-width: 600px) {
+    .chip-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.feed-section {
+    margin-bottom: 60px;
+}
+
+.section-title {
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.section-title span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.section-title i {
+    font-size: 1.1rem;
+}

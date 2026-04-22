@@ -2,39 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentiment Pulse | Dashboard</title>
+    <title>Dashboard | SentimentPulse</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="user-bar">
-        <span>Welcome, <strong>{{ user.name }}</strong> | Feed localized to {{ user.city }}</span>
-        <a href="/logout" style="color: #ef4444; font-size: 0.8rem;">[ Terminate Session ]</a>
-    </div>
-    <div class="glass-container">
-        <header>
-            <h1>SENTIMENT<span>PULSE</span></h1>
-            <p id="viewTitle">REAL-TIME DATA INTELLIGENCE</p>
-        </header>
+    <nav class="top-nav">
+        <div class="nav-left">
+            <i class="fas fa-satellite-dish"></i>
+            <span>Node: <strong>{{ user.city }}</strong></span>
+        </div>
+        <div class="nav-center"><h1>SENTIMENT<span>PULSE</span></h1></div>
+        <div class="nav-right"><a href="/logout" class="logout-btn">LOGOUT</a></div>
+    </nav>
 
-        <div class="search-section">
-            <div class="search-bar">
-                <input type="text" id="topicInput" placeholder="Topic (e.g. Technology, Stocks)...">
-                <input type="text" id="cityInput" placeholder="Location (Optional)...">
-                <button id="searchBtn" onclick="getSentiment()"><i class="fas fa-search"></i></button>
-            </div>
+    <aside class="side-nav">
+        <button onclick="scrollToSection('localSection')" title="Local Pulse"><i class="fas fa-map-marker-alt"></i></button>
+        <button onclick="scrollToSection('nationalSection')" title="National"><i class="fas fa-flag"></i></button>
+        <button onclick="scrollToSection('globalSection')" title="Global"><i class="fas fa-globe"></i></button>
+    </aside>
+
+    <main class="container">
+        <div class="search-panel">
+            <input type="text" id="topicInput" placeholder="Analyze specific topic...">
+            <input type="hidden" id="cityInput" value="{{ user.city }}">
+            <button onclick="getSentiment()" class="search-btn"><i class="fas fa-search"></i> SEARCH</button>
         </div>
 
-        <div id="loader" class="hidden">
-            <div class="spinner"></div>
-            <p>FETCHING DATA...</p>
-        </div>
+        <div id="loader" class="hidden"><div class="spinner"></div><p>SYNCING INTELLIGENCE...</p></div>
 
-        <div id="feed" class="grid-feed">
-            </div>
-    </div>
+        <section id="searchSection" class="feed-section hidden">
+            <h2 class="section-title">SEARCH RESULTS</h2>
+            <div id="searchResults" class="news-grid"></div>
+        </section>
+
+        <section id="localSection" class="feed-section">
+            <h2 class="section-title">LOCAL PULSE <span>{{ user.city }}</span></h2>
+            <div id="localFeed" class="news-grid"></div>
+        </section>
+
+        <section id="nationalSection" class="feed-section">
+            <h2 class="section-title">NATIONAL INTERESTS <span>{{ user.country }}</span></h2>
+            <div id="nationalFeed" class="news-grid"></div>
+        </section>
+
+        <section id="globalSection" class="feed-section">
+            <h2 class="section-title">GLOBAL NETWORK</h2>
+            <div id="globalFeed" class="news-grid"></div>
+        </section>
+    </main>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
