@@ -3,69 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentiment Pulse | Intel Console</title>
+    <title>Hub | SentimentPulse</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <div class="scanline"></div>
-    <canvas id="particleCanvas"></canvas>
-
-    <div class="glass-container">
-        <div class="terminal-header">
-            <span class="live-indicator">● SYSTEM ACTIVE</span>
-            <div id="systemLog" class="system-log">_BOOT_COMPLETE...</div>
-        </div>
-        
-        <header>
-            <h1>SENTIMENT<span>PULSE</span></h1>
-            <p id="viewTitle">CORE INTELLIGENCE FEED</p>
-        </header>
-
-        <div class="search-section">
-            <div class="search-bar">
-                <input type="text" id="topicInput" placeholder="ENTER TARGET...">
-                <button onclick="getSentiment()"><i class="fas fa-magnifying-glass"></i></button>
+    <nav class="top-nav">
+        <div class="nav-left"><h1>SENTIMENT<span>PULSE</span></h1></div>
+            <div class="nav-right">
+                <span class="status-dot">● SYSTEM ACTIVE</span>
+                <button onclick="openSettings()" class="settings-btn"><i class="fas fa-cog"></i> SETTINGS</button>
+                <a href="/logout" class="logout-btn">LOGOUT</a>
             </div>
-            <div id="historyList" class="history-list"></div>
-        </div>
+        </nav>
 
-        <div id="intelHub" class="hidden">
-            <div class="dashboard-grid">
-                <div class="chart-wrapper"><canvas id="sentimentChart"></canvas></div>
-                <div class="stats-panel">
-                    <div class="summary-box" id="summaryBox">WAITING...</div>
-                    <div class="keyword-intel">
-                        <label>DETECTED KEYWORDS:</label>
-                        <div id="keywordList" class="keyword-tags"></div>
-                    </div>
+        <main class="container hub-container">
+            <div id="settingsModal" class="modal hidden" style="display: none;">
+        <div class="modal-content auth-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="color: var(--accent); margin:0; font-size: 1.1rem; letter-spacing: 3px;">
+                    <i class="fas fa-sliders-h"></i> SYSTEM SETTINGS
+                </h2>
+                <button onclick="closeSettings()" style="background:none; border:none; color:#ef4444; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            
+            <div class="field">
+                <label>CURRENT NODE (READ-ONLY)</label>
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem;">
+                    <i class="fas fa-map-pin"></i> {{ user.city }}, {{ user.country }}
                 </div>
             </div>
+            
+            <h3 class="section-label" style="margin-top:20px;">EXPERTISE MATRIX (INTERESTS)</h3>
+            <div class="chip-grid" style="grid-template-columns: repeat(3, 1fr);">
+                {% set all_topics = ['Technology', 'AI & ML', 'Cyber Security', 'Business', 'Finance', 'Sports', 'Space', 'Automobiles', 'Environment', 'Health', 'Science', 'Politics'] %}
+                {% for topic in all_topics %}
+                    <label class="chip">
+                        <input type="checkbox" name="modal_category" value="{{ topic }}" {% if topic in interests %}checked{% endif %}>
+                        <span>{{ topic }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+            
+            <button onclick="saveInterests()" class="btn-primary" style="margin-top: 30px;" id="saveBtn">
+                COMMIT CHANGES
+            </button>
         </div>
-
-        <div id="loader" class="hidden">
-            <div class="pulse"></div>
-            <div class="glitch-text">INTERCEPTING DATA...</div>
-        </div>
-
-        <div class="tuning-bar hidden" id="filterBar">
-            <div class="tuning-label">SIGNAL TUNING:</div>
-            <select id="sentimentFilter" onchange="applyFilters()">
-                <option value="all">MOOD: ALL</option>
-                <option value="Positive">MOOD: POSITIVE</option>
-                <option value="Negative">MOOD: NEGATIVE</option>
-            </select>
-            <select id="langFilter" onchange="getSentiment()">
-                <option value="en">LANG: ENGLISH</option>
-                <option value="hi">LANG: HINDI</option>
-                <option value="gu">LANG: GUJARATI</option>
-                <option value="fr">LANG: FRENCH</option>
-            </select>
-        </div>
-
-        <div id="feed" class="grid-feed"></div>
     </div>
+
+        <div class="trending-container">
+            <div class="trending-label">TRENDING NOW:</div>
+            <div id="trendingStrip" class="trending-strip">
+                <span class="loading-text">INTERCEPTING TRENDS...</span>
+            </div>
+        </div>
+
+        <div class="branding" style="text-align: center; margin-bottom: 30px;">
+            <p style="letter-spacing: 5px; color: var(--accent);">INTELLIGENCE HUB</p>
+        </div>
+
+        <div class="search-panel-wrapper" style="max-width: 850px; margin: 0 auto 30px;">
+            <div class="mode-toggle" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <button id="singleModeBtn" class="toggle-btn active" onclick="setSearchMode('single')">SINGLE ANALYZER</button>
+                <button id="vsModeBtn" class="toggle-btn" onclick="setSearchMode('vs')">VS COMPARISON</button>
+            </div>
+
+            <div id="singleSearch" class="search-panel" style="display: flex; gap: 10px;">
+                <input type="text" id="topicInput" placeholder="Analyze custom topic (e.g. NVIDIA, Bitcoin)..." style="flex: 2;">
+                <select id="sentimentFilter" class="custom-select" style="flex: 0.5; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 30px; padding: 0 15px;">
+                    <option value="all">ALL MOODS</option>
+                    <option value="Positive">POSITIVE</option>
+                    <option value="Negative">NEGATIVE</option>
+                    <option value="Neutral">NEUTRAL</option>
+                </select>
+                <button onclick="getSentiment()"><i class="fas fa-search"></i> SEARCH</button>
+            </div>
+
+            <div id="vsSearch" class="search-panel hidden" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="topicInputA" placeholder="Topic A (e.g. Apple)" style="flex: 1;">
+                <span class="vs-divider" style="color: var(--accent); font-weight: bold; font-style: italic;">VS</span>
+                <input type="text" id="topicInputB" placeholder="Topic B (e.g. Google)" style="flex: 1;">
+                <button onclick="getComparison()"><i class="fas fa-bolt"></i> RUN VS ANALYSIS</button>
+            </div>
+        </div>
+
+        <div class="category-filter-bar" style="max-width: 850px; margin: 0 auto 40px;">
+            <button class="cat-pill" onclick="quickFilter('Technology')">TECH</button>
+            <button class="cat-pill" onclick="quickFilter('Finance')">FINANCE</button>
+            <button class="cat-pill" onclick="quickFilter('Sports')">SPORTS</button>
+            <button class="cat-pill" onclick="quickFilter('Politics')">POLITICS</button>
+            <button class="cat-pill" onclick="quickFilter('Entertainment')">MEDIA</button>
+        </div>
+
+        <div id="loader" class="hidden"><div class="spinner"></div></div>
+
+        <section id="searchSection" class="feed-section hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin-bottom: 0;">SEARCH RESULTS</h2>
+                <div class="export-actions" style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="copyShareLink()" class="action-btn"><i class="fas fa-link"></i></button>
+                    <button onclick="generatePNG()" class="action-btn"><i class="fas fa-image"></i></button>
+                    <button onclick="window.print()" class="action-btn"><i class="fas fa-file-pdf"></i></button>
+                    <button onclick="closeSearch()" style="background: none; border: 1px solid #ef4444; color: #ef4444; padding: 5px 15px; border-radius: 20px; cursor: pointer;">CLOSE</button>
+                </div>
+            </div>
+            <div id="searchResults" class="news-grid"></div>
+        </section>
+
+        <section id="comparisonSection" class="feed-section hidden">
+            <div class="comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div id="colA" class="comp-column">
+                    <div class="hero-meter" id="meterA"></div>
+                    <div id="resultsA" class="news-grid" style="grid-template-columns: 1fr;"></div>
+                </div>
+                <div id="colB" class="comp-column">
+                    <div class="hero-meter" id="meterB"></div>
+                    <div id="resultsB" class="news-grid" style="grid-template-columns: 1fr;"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="hub-grid">
+            <div class="hub-card active-node">
+                <div class="hub-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                <span>LOCAL PULSE</span>
+                </div>
+            <div id="localFeed" class="news-grid-mini">
+                <span class="loading-text">INITIALIZING LOCAL NODE...</span>
+            </div>
+            <a href="/local" class="view-all-link">FULL ACCESS →</a>
+            </div>
+
+            <div class="hub-card">
+            <div class="hub-header">
+                <i class="fas fa-flag"></i>
+                <span>NATIONAL INTERESTS</span>
+            </div>
+                <div id="nationalFeed" class="news-grid-mini">
+                    <button onclick="lazyLoadTier('national')" class="activate-btn">ACTIVATE NATIONAL FEED</button>
+                </div>
+                <a href="/national" class="view-all-link">FULL ACCESS →</a>
+            </div>
+
+            <div class="hub-card">
+                <div class="hub-header">
+                    <i class="fas fa-globe"></i>
+                    <span>GLOBAL NETWORK</span>
+                </div>
+                <div id="globalFeed" class="news-grid-mini">
+                    <button onclick="lazyLoadTier('global')" class="activate-btn">ACTIVATE GLOBAL FEED</button>
+                </div>
+                <a href="/global" class="view-all-link">FULL ACCESS →</a>
+            </div>
+        </div>
+
+        <div id="settingsModal" class="modal hidden">
+            <div class="modal-content auth-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: var(--accent); margin:0; font-size: 1.2rem; letter-spacing: 2px;">SETTINGS</h2>
+                    <button onclick="closeSettings()" style="background:none; border:none; color:#ef4444; font-size:1.5rem;">&times;</button>
+                </div>
+                <h3 class="section-label">UPDATE INTERESTS</h3>
+                <div class="chip-grid">
+                    {% set all_topics = ['Technology', 'AI & ML', 'Cyber Security', 'Business', 'Finance', 'Sports', 'Space', 'Automobiles', 'Environment', 'Health', 'Science', 'Politics'] %}
+                    {% for topic in all_topics %}
+                        <label class="chip">
+                            <input type="checkbox" name="modal_category" value="{{ topic }}" {% if topic in interests %}checked{% endif %}>
+                            <span>{{ topic }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <button onclick="saveInterests()" class="btn-primary" style="margin-top: 30px;" id="saveBtn">SAVE CHANGES</button>
+            </div>
+        </div>
+    </main>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
